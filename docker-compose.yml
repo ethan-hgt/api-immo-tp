@@ -1,0 +1,15 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./symfony:/var/www/html
+    ports:
+      - "8000:8000"
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025" # Port SMTP pour que Symfony envoie les emails
+      - "8025:8025" # Interface web pour voir les emails
