@@ -1,0 +1,15 @@
+# Configuration GitGuardian
+version: 2
+
+# Les secrets dans l'historique avant ce commit sont considérés comme résolus
+# car ils ont été révoqués/régénérés
+paths-ignore:
+  - "**/.env.dev"  # Fichier supprimé, secrets révoqués
+  - "**/*.lock"
+  - "**/vendor/**"
+  - "**/node_modules/**"
+
+# Ignorer les faux positifs
+matches-ignore:
+  - name: Generic Password
+    match: JWT_PASSPHRASE=
