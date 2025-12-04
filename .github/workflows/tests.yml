@@ -1,0 +1,95 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, feature/* ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  tests:
+    name: Tests PHPUnit (PHP 8.4)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: intl, pdo_sqlite, opcache
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        working-directory: ./symfony
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+        working-directory: ./symfony
+
+      - name: Create JWT keys
+        run: |
+          mkdir -p config/jwt
+          openssl genrsa -out config/jwt/private.pem 4096
+          openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
+          chmod 644 config/jwt/private.pem config/jwt/public.pem
+        working-directory: ./symfony
+
+      - name: Create test database
+        run: php bin/console doctrine:schema:create --env=test
+        working-directory: ./symfony
+        env:
+          APP_ENV: test
+          DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.test.db3
+          JWT_PASSPHRASE: ''
+
+      - name: Load fixtures
+        run: php bin/console doctrine:fixtures:load --env=test -n
+        working-directory: ./symfony
+        env:
+          APP_ENV: test
+          DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.test.db3
+          JWT_PASSPHRASE: ''
+
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit --testdox
+        working-directory: ./symfony
+        env:
+          APP_ENV: test
+          APP_SECRET: 'test-secret-for-ci'
+          DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.test.db3
+          MAILER_DSN: 'null://null'
+          JWT_PASSPHRASE: ''
+          JWT_SECRET_KEY: '%kernel.project_dir%/config/jwt/private.pem'
+          JWT_PUBLIC_KEY: '%kernel.project_dir%/config/jwt/public.pem'
+
+      - name: Run tests with coverage
+        run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
+        working-directory: ./symfony
+        env:
+          APP_ENV: test
+          APP_SECRET: 'test-secret-for-ci'
+          DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.test.db3
+          MAILER_DSN: 'null://null'
+          JWT_PASSPHRASE: ''
+          JWT_SECRET_KEY: '%kernel.project_dir%/config/jwt/private.pem'
+          JWT_PUBLIC_KEY: '%kernel.project_dir%/config/jwt/public.pem'
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./symfony/coverage.xml
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
