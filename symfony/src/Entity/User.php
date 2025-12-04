@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Annotation\Groups; // Très important pour cont
     operations: [
         new GetCollection(security: "is_granted('ROLE_USER')"),
         new Get(),
-        new Post() 
+        new Post(processor: \App\State\UserProcessor::class) 
     ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:create']],
