@@ -1,0 +1,19 @@
+{
+    "php.validate.executablePath": "/usr/local/bin/php",
+    "php-cs-fixer.executablePath": "${workspaceFolder}/symfony/vendor/bin/php-cs-fixer",
+    "php-cs-fixer.config": "${workspaceFolder}/symfony/.php-cs-fixer.dist.php",
+    "php-cs-fixer.onsave": true,
+    "[php]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "junstyle.php-cs-fixer"
+    },
+    "files.associations": {
+        "*.php": "php"
+    },
+    "files.exclude": {
+        "**/.DS_Store": true,
+        "**/node_modules": true,
+        "symfony/var": true,
+        "symfony/vendor": true
+    }
+}

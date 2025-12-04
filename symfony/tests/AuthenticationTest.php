@@ -65,15 +65,15 @@ class AuthenticationTest extends ApiTestCase
 
         // On crée un nouvel utilisateur via l'API
         // On utilise un email unique pour éviter les erreurs de doublons
-        $email = 'test.mail.' . uniqid() . '@example.com';
+        $email = 'test.mail.'.uniqid().'@example.com';
 
         $client->request('POST', '/api/users', [
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'email' => $email,
                 'password' => 'password123',
-                'roles' => ['ROLE_USER']
-            ]
+                'roles' => ['ROLE_USER'],
+            ],
         ]);
 
         // 1. On vérifie que la création a réussi (Code 201 Created)

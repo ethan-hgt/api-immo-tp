@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Annotation\Groups; // Très important pour cont
     operations: [
         new GetCollection(security: "is_granted('ROLE_USER')"),
         new Get(),
-        new Post(processor: \App\State\UserProcessor::class) 
+        new Post(processor: \App\State\UserProcessor::class),
     ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:create']],
@@ -28,7 +28,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user:read'])] 
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
@@ -46,7 +46,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Groups(['user:create'])] 
+    #[Groups(['user:create'])]
     private ?string $password = null;
 
     public function getId(): ?int

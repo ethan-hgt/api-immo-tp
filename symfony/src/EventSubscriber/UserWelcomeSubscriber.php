@@ -13,7 +13,8 @@ class UserWelcomeSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private MailerInterface $mailer
-    ) {}
+    ) {
+    }
 
     public function getSubscribedEvents(): array
     {

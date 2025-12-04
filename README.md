@@ -55,12 +55,18 @@ docker compose ps
 # 4. Installer les dépendances PHP (si nécessaire)
 docker compose exec php composer install
 
-# 5. Créer les clés JWT (déjà présentes dans le repo)
+# 5. Configurer les secrets locaux (IMPORTANT pour la sécurité)
+# Copier le fichier d'exemple et générer un nouveau secret
+cp symfony/.env.dev.example symfony/.env.local
+# Générer un nouveau APP_SECRET
+docker compose exec php php -r "echo 'APP_SECRET=' . bin2hex(random_bytes(16)) . PHP_EOL;" >> symfony/.env.local
+
+# 6. Créer les clés JWT (déjà présentes dans le repo)
 # Si besoin de régénérer :
 docker compose exec php openssl genrsa -out config/jwt/private.pem 4096
 docker compose exec php openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
 
-# 6. L'API est maintenant accessible sur http://localhost:8000
+# 7. L'API est maintenant accessible sur http://localhost:8000
 ```
 
 ### Accéder à l'API
@@ -268,14 +274,31 @@ docker compose exec php php bin/console mailer:test test@example.com
 API Platform génère automatiquement la documentation OpenAPI/Swagger :
 👉 http://localhost:8000/api/docs
 
-### ⏳ Formateur automatique (en cours)
+### ✅ Formateur automatique PHP-CS-Fixer (0.5 pts)
 
-Configuration d'un formateur de code (PHP-CS-Fixer) avec autoformat à la sauvegarde dans VSCode.
+Configuration complète de PHP-CS-Fixer avec :
+- Règles PSR-12 et Symfony
+- Format automatique à la sauvegarde dans VSCode
+- Vérification dans le pipeline CI/CD
+
+**Utilisation :**
+```bash
+# Vérifier le formatage
+docker compose exec php vendor/bin/php-cs-fixer fix --dry-run --diff
+
+# Appliquer le formatage
+docker compose exec php vendor/bin/php-cs-fixer fix
+```
+
+**Configuration VSCode :**
+1. Installer l'extension `junstyle.php-cs-fixer`
+2. Les fichiers `.vscode/settings.json` et `.vscode/extensions.json` sont déjà configurés
+3. Le formatage se fait automatiquement à la sauvegarde
 
 ### ✅ Pipeline CI/CD GitHub Actions (0.5 pts)
 
 - Tests automatiques sur chaque push
-- Vérification de la qualité du code
+- Vérification du formatage du code (PHP-CS-Fixer)
 - Badge de statut dans le README
 
 ### ⏳ Coverage Badge (en cours)
@@ -323,6 +346,22 @@ docker compose exec php php bin/console cache:clear --env=test
 ```bash
 docker compose exec php tail -f var/log/dev.log
 ```
+
+## 🔒 Sécurité
+
+### Fichiers sensibles
+
+⚠️ **IMPORTANT** : Les fichiers suivants ne doivent **JAMAIS** être commités dans Git :
+- `symfony/.env.local` : Contient les secrets locaux
+- `symfony/.env.*.local` : Fichiers d'environnement locaux
+- `symfony/config/jwt/*.pem` : Clés JWT (déjà dans .gitignore)
+
+### Bonnes pratiques
+
+1. **Secrets en local** : Utilisez toujours `.env.local` pour vos secrets
+2. **Pas de secrets hardcodés** : Jamais de mots de passe dans le code
+3. **Rotation des secrets** : Changez régulièrement les secrets en production
+4. **GitGuardian** : Le repo est scanné automatiquement pour détecter les fuites
 
 ## 📖 Ressources
 

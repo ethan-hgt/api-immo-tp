@@ -14,7 +14,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  * State Processor personnalisé pour gérer la création d'utilisateurs.
  * Ce processor :
  * - Hash le mot de passe
- * - Envoie un email de bienvenue
+ * - Envoie un email de bienvenue.
  */
 final class UserProcessor implements ProcessorInterface
 {
@@ -22,7 +22,8 @@ final class UserProcessor implements ProcessorInterface
         private EntityManagerInterface $entityManager,
         private UserPasswordHasherInterface $passwordHasher,
         private MailerInterface $mailer,
-    ) {}
+    ) {
+    }
 
     /**
      * @param User $data

@@ -21,14 +21,14 @@ class UserFixtures extends Fixture
         $user = new User();
         $user->setEmail('correction'); // Le login demandé
         $user->setRoles(['ROLE_USER']);
-        
+
         $user->setPassword(
             $this->passwordHasher->hashPassword(
                 $user,
                 'correction'
             )
         );
-        
+
         $manager->persist($user);
 
         $manager->flush();

@@ -63,6 +63,10 @@ jobs:
           DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.test.db3
           JWT_PASSPHRASE: ''
 
+      - name: Check code style with PHP-CS-Fixer
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+        working-directory: ./symfony
+
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --testdox
         working-directory: ./symfony

@@ -86,6 +86,7 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.1",
+        "friendsofphp/php-cs-fixer": "^3.91",
         "phpunit/phpunit": "^12.4",
         "symfony/browser-kit": "7.3.*",
         "symfony/http-client": "7.3.*",
